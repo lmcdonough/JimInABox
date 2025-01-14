@@ -4,6 +4,7 @@
 A CLI application to retrieve and display key deployment metrics for engineering teams, emulating an HTTP server and enabling tracking of critical DevOps KPIs. This project is a simulation of real-world DevOps challenges and is structured as an iterative learning exercise.
 
 ## Features 🚀
+
 - **Metrics Retrieval**: Simulate an HTTP server providing key deployment metrics.
 - **Key Metrics Tracked**:
   - Deployment Frequency
@@ -20,6 +21,7 @@ A CLI application to retrieve and display key deployment metrics for engineering
 - **Phased Approach**: Built in iterative steps to promote structured problem-solving.
 
 ## Tech Stack 🛠️
+
 - **Python**: Core programming language.
 - **Flask**: For simulating the HTTP server.
 - **Gunicorn/uWSGI**: WSGI server to handle requests.
@@ -27,39 +29,41 @@ A CLI application to retrieve and display key deployment metrics for engineering
 - **Docker**: For containerized deployment.
 
 ## Installation 🐍
+
 1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/lmcdonough/devops-metrics-viewer.git
+
+   git clone [https://github.com/lmcdonough/devops-metrics-viewer.git](https://github.com/lmcdonough/devops-metrics-viewer.git)
    cd devops-metrics-viewer
-   ```
+
 2. **Set Up Virtual Environment**:
-   ```bash
+
    python3 -m venv venv
    source venv/bin/activate
-   ```
+
 3. **Install Dependencies**:
-   ```bash
+
    pip install -r requirements.txt
-   ```
+
 4. **Run the Application**:
-   ```bash
+
    python app.py
-   ```
 
 ## Usage 🛡️
+
 - **Phase 1**: Emulates an HTTP server using `MetricsServer` to return metrics in JSON format.
 - **Phase 2**: Fetches and displays individual metrics using mocked endpoints.
 - **Phase 3**: Enhances `MetricsServer` to provide timestamps and graphing capabilities.
 
 Example Command:
-```bash
+
 python metrics_client.py --metric deployment-frequency --window 10
-```
 
 ## Sample Output 📊
-```
+
 Metric: Deployment Frequency
 Window: Last 10 minutes
+
+```bash
 Graph:
 +--------------------+
 |   *   **  *  *   *|
@@ -67,16 +71,19 @@ Graph:
 ```
 
 ## Development Workflow 🧑‍💻
+
 1. Implement HTTP server (`Phase 1`).
 2. Mock CI metrics (`Phase 2`).
 3. Add timestamped metrics and graph visualization (`Phase 3`).
 
 ## Future Enhancements 🛠️
+
 - Write comprehensive tests for `MetricsServer`.
 - Add support for real CI/CD API integration.
 - Improve visualization using libraries like `matplotlib`.
 
 ## License 📜
+
 This project is licensed under the MIT License.
 
 ---
