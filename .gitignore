@@ -120,7 +120,9 @@ cython_debug/
 
 # VSCode
 .vscode/
-.*.code-workspace
+
+# Workspace file
+jim-in-a-box.code-workspace
 
 # macOS
 .DS_Store
