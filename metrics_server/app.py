@@ -1,64 +1,73 @@
-from flask import Flask, abort, jsonify
+import logging
+from datetime import datetime
 
-# Base class for handling metrics
-class BaseMetricsServer:
-    def __init__(self):
-        # Store endpoints and their corresponding metric retrieval functions
-        self.metrics_map = {}
+from flask import Flask, request
+from markupsafe import escape
+from metrics_server.serializer import MetricsSerializer
 
-    def add_metric(self, endpoint, retrieval_function):
-        """
-        Register a new metric endpoint with a retrieval function.
-        :param endpoint: API route for the metric (e.g., "/deployment-frequency")
-        :param retrieval_function: Function to calculate or retrieve the metric
-        """
-        self.metrics_map[endpoint] = retrieval_function
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-    def get_metric(self, endpoint):
-        """
-        Retrieve metric data for a given endpoint.
-        :param endpoint: API route
-        :return: JSON response with status and data
-        """
-        if endpoint in self.metrics_map:
-            return {"status": "OK", "data": self.metrics_map[endpoint]()}
-        return {"status": "Error", "message": "Endpoint not found"}
-
-# Child class for specific metrics
-class MetricsServer(BaseMetricsServer):
-    def __init__(self):
-        super().__init__()
-
-        # Registering specific metrics with their retrieval functions
-        self.add_metric("/deployment-frequency", self.get_deployment_frequency)
-        self.add_metric("/change-lead-time", self.get_change_lead_time)
-
-    # Example metric retrieval functions
-    @staticmethod
-    def get_deployment_frequency():
-        return {"deployment-frequency": 42}
-
-    @staticmethod
-    def get_change_lead_time():
-        return {"change-lead-time": "15 minutes"}
-
-# Flask application setup
+# Initialize Flask app
 app = Flask(__name__)
 
-# Create an instance of the MetricsServer
-metrics_server = MetricsServer()
+# Path to the metrics data file
+METRICS_DATA_FILE = 'metrics_server/data/metrics_data.json'
 
-@app.route("/<path:endpoint>", methods=["GET"])
-def handle_request(endpoint):
-    """
-    Handle incoming GET requests and retrieve metrics using MetricsServer.
-    :param endpoint: The API endpoint requested
-    :return: JSON response with the metric data or an error message
-    """
-    response = metrics_server.get_metric(f"/{endpoint}")
-    if response["status"] == "Error":
-        abort(404, description=response["message"])
-    return jsonify(response)
+# Load metrics data from a separate JSON file
+metrics_data = MetricsSerializer.read_metrics_data(METRICS_DATA_FILE)
 
-if __name__ == "__main__":
+# Endpoint to dynamically fetch a specific metric
+@app.route('/metrics/<metric_name>', methods=['GET'])
+def get_metric(metric_name):
+    try:
+        metric_name = metric_name.strip()  # Remove leading/trailing whitespace
+        logger.info('Fetching metric: %s', metric_name)
+
+        # Check if metric exists and return it
+        if metric_name in metrics_data:
+            data = {
+                "metric": escape(metric_name),
+                "value": escape(metrics_data[metric_name]),
+                "timestamp": datetime.now(datetime.timezone.utc).isoformat(),
+            }
+            return MetricsSerializer.serialize_response("OK", data)
+        logger.warning('Metric %s not found', metric_name)
+        return MetricsSerializer.serialize_response("ERROR", {"error": "Metric not found"}), 404
+    except Exception as e:
+        logger.error('Unexpected error fetching metric %s: %s', metric_name, str(e))
+        return (
+            MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
+            500,
+        )
+
+# Endpoint to add a new metric
+@app.route('/metrics', methods=['POST'])
+def add_metric():
+    try:
+        request_data = request.data  # Get raw request data
+        logger.info("Received request to add metric")
+
+        # Deserialize JSON data
+        metric_data = MetricsSerializer.deserialize_request(request_data)
+        if not metric_data:
+            return MetricsSerializer.serialize_response("ERROR", {"error": "Invalid JSON"}), 400
+
+        logger.info('Adding new metric: %s', metric_data)
+
+        # Update metrics data and write to file
+        metrics_data.update(metric_data)
+        MetricsSerializer.write_metrics_data(METRICS_DATA_FILE, metrics_data)
+
+        return MetricsSerializer.serialize_response("OK", {"message": "Metric added successfully"})
+    except Exception as e:
+        logger.error('Unexpected error adding metric: %s', e)
+        return (
+            MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
+            500,
+        )
+
+# Run the Flask app in debug mode
+if __name__ == '__main__':
     app.run(debug=True)
