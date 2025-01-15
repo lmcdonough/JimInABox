@@ -50,13 +50,14 @@ A CLI application to retrieve and display key deployment metrics for engineering
 
 ## Usage 🛡️
 
-- **Phase 1**: Emulates an HTTP server using `MetricsServer` to return metrics in JSON format.
-- **Phase 2**: Fetches and displays individual metrics using mocked endpoints.
-- **Phase 3**: Enhances `MetricsServer` to provide timestamps and graphing capabilities.
+- **Phase 1**: Emulates an HTTP server using `MetricsServer` to return metrics in JSON format. (*Completed*)
+- **Phase 2**: Fetches and displays individual metrics using mocked endpoints. (*In Progress*)
+- **Phase 3**: Enhances `MetricsServer` to provide timestamps and graphing capabilities. (*TODO*)
 
 Example Command:
-
+```bash
 python metrics_client.py --metric deployment-frequency --window 10
+```
 
 ## Sample Output 📊
 
@@ -72,9 +73,9 @@ Graph:
 
 ## Development Workflow 🧑‍💻
 
-1. Implement HTTP server (`Phase 1`).
-2. Mock CI metrics (`Phase 2`).
-3. Add timestamped metrics and graph visualization (`Phase 3`).
+1. Implement HTTP server (`Phase 1`). (_Completed_)
+2. Mock CI metrics (`Phase 2`). (*In Progress*)
+3. Add timestamped metrics and graph visualization (`Phase 3`). (*TODO*)
 
 ## Future Enhancements 🛠️
 
