@@ -10,6 +10,7 @@ packages = [{ include = "metrics_server" }]
 [tool.poetry.dependencies]
 python = ">=3.10"
 flask = "^3.1.0"
+rich = "^13.9.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.0"

@@ -1,92 +1,85 @@
-
 # DevOps Metrics Viewer
 
-A CLI application to retrieve and display key deployment metrics for engineering teams, emulating an HTTP server and enabling tracking of critical DevOps KPIs. This project is a simulation of real-world DevOps challenges and is structured as an iterative learning exercise.
+A modular Python project to simulate an HTTP server that retrieves and displays key deployment metrics for engineering teams. This project provides hands-on practice with Python classes, decorators, and structured logging using `rich`. It is structured as an iterative learning exercise focused on real-world DevOps challenges.
 
-## Features 🚀
+### Features 🚀
+   •  Metrics Retrieval: Simulates an HTTP server (MetricsServer) providing key deployment metrics in JSON format.
+   •  Key Metrics Tracked:
+   •  Deployment Frequency
+   •  Change Lead Time
+   •  Mean Time to Recovery (MTTR)
+   •  Change Failure Rate
+   •  Cycle Time
+   •  Automation Percentage
+   •  Test Coverage
+   •  System Uptime & Availability
+   •  Customer Feedback
+   •  Team Collaboration & Satisfaction
+   •  Rich Logging: Outputs clean, color-coded logs for requests and operations using the `rich` library.
+   •  Phased Development: Built incrementally to encourage structured problem-solving and extensibility.
+   •  Environment Management: Utilizes Poetry for managing dependencies and project setup.
 
-- **Metrics Retrieval**: Simulate an HTTP server providing key deployment metrics.
-- **Key Metrics Tracked**:
-  - Deployment Frequency
-  - Change Lead Time
-  - Mean Time to Recovery (MTTR)
-  - Change Failure Rate
-  - Cycle Time
-  - Automation Percentage
-  - Test Coverage
-  - System Uptime & Availability
-  - Customer Feedback
-  - Team Collaboration & Satisfaction
-- **Graphical Visualization**: Display trends of metrics over 5, 10, and 30-minute windows using a text-based plotting library.
-- **Phased Approach**: Built in iterative steps to promote structured problem-solving.
+### Tech Stack 🛠️
+   •  Python: Core programming language.
+   •  Flask: For building the HTTP server.
+   •  Rich: For color-coded logging and better developer experience.
+   •  Poetry: For dependency management and environment setup.
+   •  Unit Testing: Using unittest for robust test coverage.
 
-## Tech Stack 🛠️
+### Installation 🐍
+   1. Clone the Repository:
+    
+    ```
+    
+    git clone https://github.com/lmcdonough/devops-metrics-viewer.git
+    cd devops-metrics-viewer
+    
+    ```
 
-- **Python**: Core programming language.
-- **Flask**: For simulating the HTTP server.
-- **Gunicorn/uWSGI**: WSGI server to handle requests.
-- **tplot**: Library for text-based graphical visualization.
-- **Docker**: For containerized deployment.
+   1. Set Up the Environment with Poetry:
+    
+    ```bash
+    # Install Poetry
+    pip install poetry
+    
+    # Install dependencies
+    poetry install
+    ```
 
-## Installation 🐍
+   2. Run the Application:
 
-1. **Clone the Repository**:
+    ```bash
+    # Start the Flask server
+    poetry run python main.py
+    ```
 
-   git clone [https://github.com/lmcdonough/devops-metrics-viewer.git](https://github.com/lmcdonough/devops-metrics-viewer.git)
-   cd devops-metrics-viewer
 
-2. **Set Up Virtual Environment**:
+### Usage 🛡️
 
-   python3 -m venv venv
-   source venv/bin/activate
+API Endpoints
+   •  `GET /metrics`: Retrieve metrics based on the provided endpoint parameter.
 
-3. **Install Dependencies**:
+Example Request:
 
-   pip install -r requirements.txt
+`curl "http://127.0.0.1:5000/metrics?endpoint=http://acme.com/ms/deployment-frequency"`
 
-4. **Run the Application**:
+### Phases of Development:
+   1. Phase 1: Emulates an HTTP server to return metrics in JSON format. (Complete)
+   2. Phase 2: Implement client for Fetching metrics from Mocked endpoints in `MetricsServer`. (In Progress)
+   3. Phase 3: Add timestamps and text-based graphing. 
 
-   python app.py
+### Development Workflow 🧑‍💻
+   1. Implement a Flask-based server (`MetricsServer`) with modular design.
+   2. Add mocked metrics in a JSON file for easy data management.
+   3. Use Python decorators to log incoming requests with rich.
+   4. Write unit tests for API endpoints to ensure reliability.
+   5. Plan for extending functionality with timestamped data and visualizations.
 
-## Usage 🛡️
+### Future Enhancements 🛠️
+   •  Extend functionality to include real-time CI/CD metrics via API integration.
+   •  Add timestamped metrics and trend visualization (Phase 3).
+   •  Implement more advanced text-based or graphical visualization libraries like matplotlib.
 
-- **Phase 1**: Emulates an HTTP server using `MetricsServer` to return metrics in JSON format. (*Completed*)
-- **Phase 2**: Fetches and displays individual metrics using mocked endpoints. (*In Progress*)
-- **Phase 3**: Enhances `MetricsServer` to provide timestamps and graphing capabilities. (*TODO*)
-
-Example Command:
-```bash
-python metrics_client.py --metric deployment-frequency --window 10
-```
-
-## Sample Output 📊
-
-Metric: Deployment Frequency
-Window: Last 10 minutes
-
-```bash
-Graph:
-+--------------------+
-|   *   **  *  *   *|
-+--------------------+
-```
-
-## Development Workflow 🧑‍💻
-
-1. Implement HTTP server (`Phase 1`). (_Completed_)
-2. Mock CI metrics (`Phase 2`). (*In Progress*)
-3. Add timestamped metrics and graph visualization (`Phase 3`). (*TODO*)
-
-## Future Enhancements 🛠️
-
-- Write comprehensive tests for `MetricsServer`.
-- Add support for real CI/CD API integration.
-- Improve visualization using libraries like `matplotlib`.
-
-## License 📜
+### License 📜
 
 This project is licensed under the MIT License.
-
----
-
-![License](https://img.shields.io/badge/license-MIT-blue)
