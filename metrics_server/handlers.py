@@ -4,34 +4,41 @@
 """
 
 import json
-import os
 from rich.console import Console
 
-# console instance for logging
 console = Console()
 
-# business logic for handling metrics
-class MetricsHandler(self):
-	def __init__(self):
-		# load the mock data on initialization
-		self.data = self.load_mock_data()
+# Load example data from JSON fixtures
+with open("data/metrics_data.json", "r") as f:
+	METRIC_DATA = json.load(f)
 
-	@staticmethod
-	def load_mock_data():
-		# load JSON data from the metrics.json file
-		data_file = os.path.join(os.path.dirname(__file__), 'data', 'metrics.json')
-		with open(data_file, 'r') as file:
-			# log when data is successfully loaded
-			console.log(f"[blue]Loaded mock data from {data_file}[/blue]")
-			return json.load(file)
+class MetricHandler:
 
-	def get_metric(self, endpoint):
-		# Fetch metric data for the given endpoint
-		response = self.data.get(endpoint)
-		if response:
-			# log success
-			console.log(f"[green]Metric found for endpoint: {endpoint}[/green]")
-			return ({"status": "OK", "data": response})
-		# Log failure if not data is found
-		console.log(f"[red]Nod metric found for endopint: {endpoint}[/red]")
-		return {"status": "ERROR", "message": "Endpoint not found"}
+	def __init__(self, metric_name, server):
+		"""
+		Initialize the handler withe the metric name and the server instance
+		:param metric_name: Name of the metric being handled (e.g. 'deployment-frequency')
+		:param server: Reference to the MetricsServer instance
+		"""
+		self.metric_name = metric_name
+		self.server = server
+
+	def handle_request(self):
+		"""
+		Handles the HTTP requests for the Metric.
+		Fetches the data for the Metric and returns it in the expected format.
+		:return: JSON response with the metric data
+		"""
+
+		# log to the console
+		console.log(f"Processing request for metric: [bold green]{self.metric_name}[/bold green]")
+		# Fetch data from the preloaded JSON fixture
+		data = METRIC_DATA.get(self.metric_name, "Metric not found")
+		# return the data or error message
+		return {
+			"status": "OK" if data != "Metri not found" else "Error",
+			"data": {
+				"metric_name": self.metric_name,
+				"value": data
+			}
+		}
