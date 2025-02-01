@@ -10,11 +10,11 @@ from rich.console import Console
 console = Console()
 
 # Load example data from JSON fixtures
-with open("config/metric_data.json", "r") as f:
+with open("metrics_server/config/metric_data.json", "r") as f:
     METRIC_DATA = json.load(f)
 
 # Load the routes from the config file
-with open("config/routes.json", "r") as f:
+with open("metrics_server/config/routes.json", "r") as f:
     ROUTES = json.load(f)
 
 # Handler class for handling metric requests dynamically
@@ -45,7 +45,7 @@ class MetricHandler:
             "status": "OK" if data != "Metri not found" else "Error",
             "data": {"metric_name": self.metric_name, "value": data},
         }
-	
+
 # Routes class for  managing routes and their corresponding handlers
 class Routes:
     def __init__(self):
@@ -53,7 +53,7 @@ class Routes:
         # Load routes from the config file
         with open("config/routes.json", "r") as f:
             self.routes = json.load(f)
-		
+
     def get_route(self, metric_name):
         """
         Get the route for a given metric name
@@ -61,7 +61,7 @@ class Routes:
         :return: The route for the metric, or None if not found
         """
         return self.routes.get(metric_name)
-    
+
     def get_routes(self):
         """Get all routes in the config file
         :return: A dictionary of all routes
