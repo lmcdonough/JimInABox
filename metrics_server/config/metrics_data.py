@@ -1,4 +1,4 @@
-{
+METRICS_DATA = {
     "deployment-frequency": "5 deployments/day",
     "change-lead-time": "2 hours",
     "mean-time-to-recovery": "15 minutes",

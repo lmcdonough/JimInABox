@@ -70,4 +70,4 @@ def add_metric():
 
 # Run the Flask app in debug mode
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
