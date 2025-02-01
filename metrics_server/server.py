@@ -4,14 +4,15 @@
 - Keeps routes minimal by delegating logic to handlers.py
 """
 
-from metrics_server.config.metrics_data import METRIC_DATA
-  # import for sweet ass logging
-
-from metrics_server.config.routes import ROUTES  # import routes config
-from metrics_server.handlers import MetricHandler  # import handler class for processing requests
-from metrics_server.logger import log_request  # handy dandy decorator I made for logging requests
+from metrics_server.config.metric_data import METRIC_DATA
+  # import routes config
+from metrics_server.config.routes import ROUTES
+  # import handler class for processing requests
+from metrics_server.handlers import MetricHandler
+  # handy dandy decorator I made for logging requests
+from metrics_server.logger import log_request
 from rich.console import Console
-  # import metrics data
+  # import for sweet ass logging
 
 # Initialize a consolse instance for rich logging
 console = Console()
