@@ -5,6 +5,10 @@
 		}
 	],
 	"settings": {
-		"python.pythonPath": "~/.cache/pypoetry/virtualenvs/jim-in-a-box-4_s-B31c/bin/python"
+		"python.pythonPath": "~/.cache/pypoetry/virtualenvs/jim-in-a-box-4_s-B31c/bin/python",
+		"github.copilot.enable": {
+			"*": true,
+			"python": false
+		}
 	}
 }
