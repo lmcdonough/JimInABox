@@ -86,6 +86,7 @@ cython_debug/
 # VSCode files and directories
 .vscode/
 *.code-workspace
+/Users/levi/vscode_workspaces/jim-in-a-box/jim-in-a-box.code-workspace
 
 # macOS
 .DS_Store
