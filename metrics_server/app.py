@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Path to the metrics data file
-METRICS_DATA_FILE = 'metrics_server/data/metrics_data.json'
+METRICS_DATA_FILE = 'metrics_server/config/metric_data.json'
 
 # Load metrics data from a separate JSON file
 metrics_data = MetricsSerializer.read_metrics_data(METRICS_DATA_FILE)
