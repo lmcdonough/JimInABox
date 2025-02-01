@@ -1,5 +1,4 @@
-# Define the map of metrics to their respective URIs
-ROUTES = {
+{
     "deployment_frequency": "/metrics/deployment-frequency",
     "change_lead_time": "/metrics/change-lead-time",
     "mttr": "/metrics/mean-time-to-recovery",

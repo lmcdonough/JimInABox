@@ -3,16 +3,17 @@
 - Logs requests using a custom decorator
 - Keeps routes minimal by delegating logic to handlers.py
 """
+# import metrics config
+from metrics_server.handlers import METRIC_DATA, MetricHandler, ROUTES
+# import routes and handlers config
 
-from metrics_server.config.metric_data import METRIC_DATA
-  # import routes config
-from metrics_server.config.routes import ROUTES
-  # import handler class for processing requests
-from metrics_server.handlers import MetricHandler
-  # handy dandy decorator I made for logging requests
+# import handler class for processing requests
+
+# handy dandy decorator I made for logging requests
 from metrics_server.logger import log_request
+# import rich for sweet logging
 from rich.console import Console
-  # import for sweet ass logging
+
 
 # Initialize a consolse instance for rich logging
 console = Console()
