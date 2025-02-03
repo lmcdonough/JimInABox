@@ -47,7 +47,7 @@ class MetricsServer:
         return data
 
     # method to start the Flask server
-    def run(self, host="0.0.0.0", port=5000, debug=True):
+    def run(self, host="0.0.0.0", port=5005, debug=True):
         """
         Runs the Flask server with the default args that specify the host, port, and mode.
         """

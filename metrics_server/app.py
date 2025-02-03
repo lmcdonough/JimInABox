@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import Flask, request
 from markupsafe import escape
@@ -27,10 +27,17 @@ def get_metric(metric_name):
 
         # Check if metric exists and return it
         if metric_name in metrics_data:
+            logger.info('Metric %s found', metric_name)
+
+            # Serialize the metric data into a dictionary
             data = {
                 "metric": escape(metric_name),
-                "value": escape(metrics_data[metric_name]),
-                "timestamp": datetime.now(datetime.timezone.utc).isoformat(),
+                "value": str(
+                    escape(metrics_data[metric_name])
+                ),  # ensure value is string safe for json
+                "timestamp": datetime.now(timezone.utc).isoformat(
+                    timespec='milliseconds'
+                ),  # consistent iso timestamp format
             }
             return MetricsSerializer.serialize_response("OK", data)
         logger.warning('Metric %s not found', metric_name)
