@@ -9,6 +9,7 @@
 		"github.copilot.enable": {
 			"*": true,
 			"python": false
-		}
+		},
+		"postman.settings.dotenv-detection-notification-visibility": false
 	}
 }
