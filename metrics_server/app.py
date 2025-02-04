@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timezone
 
-from flask import Flask, request
+from flask import Flask, redirect, request
 from markupsafe import escape
 from metrics_server.serializer import MetricsSerializer
 
@@ -17,6 +17,28 @@ METRICS_DATA_FILE = 'metrics_server/config/metric_data.json'
 
 # Load metrics data from a separate JSON file
 metrics_data = MetricsSerializer.read_metrics_data(METRICS_DATA_FILE)
+
+
+# Endpoint to fetch all metrics
+@app.route('/metrics', methods=['GET'])
+def get_metrics():
+    try:
+        logger.info('Fetching all metrics')
+        # Serialize the metrics data into a dictionary
+        data = {
+            "metrics": {escape(k): str(escape(v)) for k, v in metrics_data.items()},
+            "timestamp": datetime.now(timezone.utc).isoformat(
+                timespec='milliseconds'
+            ),  # consistent iso timestamp format
+        }
+        return MetricsSerializer.serialize_response("OK", data)
+    except Exception as e:
+        logger.error('Unexpected error fetching metrics: %s', str(e))
+        return (
+            MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
+            500,
+        )
+
 
 # Endpoint to dynamically fetch a specific metric
 @app.route('/metrics/<metric_name>', methods=['GET'])
@@ -74,6 +96,12 @@ def add_metric():
             MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
             500,
         )
+
+# endpoint that redirects to the /metrics endpoint from root
+@app.route('/', methods=['GET'])
+def index():
+    logger.info('Redirecting to /metrics')
+    return redirect('/metrics')
 
 # Run the Flask app in debug mode
 if __name__ == '__main__':
