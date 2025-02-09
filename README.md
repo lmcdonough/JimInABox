@@ -58,7 +58,7 @@ poetry install
 Use the updated Poetry command to activate the virtual environment:
 
 ```bash
-poetry env use python
+poetry env use python # python3 if using Homebrew on Mac
 poetry env info
 ```
 
