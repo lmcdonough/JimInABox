@@ -80,7 +80,7 @@ Start the Flask server:
 poetry run python main.py
 ```
 
-By default, the server will run on:  
+By default, the API server will be available at:  
 **`http://localhost:5005`**
 
 ---
