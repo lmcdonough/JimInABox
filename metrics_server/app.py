@@ -4,10 +4,7 @@ from datetime import datetime, timezone
 from flask import Flask, request
 from markupsafe import escape
 from metrics_server.serializer import MetricsSerializer
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+from metrics_server.logger import logger  # Import the logger
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -23,11 +20,11 @@ metrics_data = MetricsSerializer.read_metrics_data(METRICS_DATA_FILE)
 def get_metric(metric_name):
     try:
         metric_name = metric_name.strip()  # Remove leading/trailing whitespace
-        logger.info('Fetching metric: %s', metric_name)
+        logger.info(f'Fetching metric: {metric_name}')
 
         # Check if metric exists and return it
         if metric_name in metrics_data:
-            logger.info('Metric %s found', metric_name)
+            logger.info(f'Metric {metric_name} found')
 
             # Serialize the metric data into a dictionary
             data = {
@@ -40,10 +37,10 @@ def get_metric(metric_name):
                 ),  # consistent iso timestamp format
             }
             return MetricsSerializer.serialize_response("OK", data)
-        logger.warning('Metric %s not found', metric_name)
+        logger.warning(f'Metric {metric_name} not found')
         return MetricsSerializer.serialize_response("ERROR", {"error": "Metric not found"}), 404
     except Exception as e:
-        logger.error('Unexpected error fetching metric %s: %s', metric_name, str(e))
+        logger.error(f'Unexpected error fetching metric {metric_name}: {str(e)}')
         return (
             MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
             500,
@@ -61,7 +58,7 @@ def add_metric():
         if not metric_data:
             return MetricsSerializer.serialize_response("ERROR", {"error": "Invalid JSON"}), 400
 
-        logger.info('Adding new metric: %s', metric_data)
+        logger.info(f'Adding new metric: {metric_data}')
 
         # Update metrics data and write to file
         metrics_data.update(metric_data)
@@ -69,7 +66,7 @@ def add_metric():
 
         return MetricsSerializer.serialize_response("OK", {"message": "Metric added successfully"})
     except Exception as e:
-        logger.error('Unexpected error adding metric: %s', e)
+        logger.error(f'Unexpected error adding metric: {e}')
         return (
             MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
             500,

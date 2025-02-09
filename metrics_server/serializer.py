@@ -1,18 +1,8 @@
 import json
-import logging
 
 from flask import jsonify
-from rich.logging import RichHandler
+from metrics_server.logger import logger  # Import the logger
 
-
-# Configure logger to use RichHandler for colorful, informative logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)],
-)
-logger = logging.getLogger("metrics_logger")
 
 class MetricsSerializer:
     # Serialize response into JSON format, using rich logging for errors
@@ -27,7 +17,7 @@ class MetricsSerializer:
             return jsonify(response)
         except Exception as e:
             # log error and return 500 because serialization failed
-            logger.error("[red]Error serializing response:[/red] %s", e)
+            logger.error(f"[red]Error serializing response:[/red] {e}")
             return jsonify({"status": "ERROR", "data": {"error": "Internal server error"}}), 500
 
     # Deserialize request data from JSON format, logging with rich coloring
@@ -36,7 +26,7 @@ class MetricsSerializer:
         try:
             return json.loads(request_data)
         except json.JSONDecodeError as e:
-            logger.error("[red]Error deserializing request:[/red] %s", e)
+            logger.error(f"[red]Error deserializing request:[/red] {e}")
             return None
 
     # Read metrics data from JSON file with rich logging on error
@@ -45,10 +35,10 @@ class MetricsSerializer:
         try:
             with open(file_path, 'r') as file:
                 data = json.load(file)
-                logger.info("[green]Successfully loaded metrics data from %s[/green]", file_path)
+                logger.info(f"[green]Successfully loaded metrics data from {file_path}[/green]")
                 return data
         except Exception as e:
-            logger.error("[red]Error reading metrics data from %s:[/red] %s", file_path, e)
+            logger.error(f"[red]Error reading metrics data from {file_path}:[/red] {e}")
             return {}
 
     # Write metrics data to JSON file with informative rich logs
@@ -57,6 +47,6 @@ class MetricsSerializer:
         try:
             with open(file_path, 'w') as file:
                 json.dump(data, file, indent=4)
-            logger.info("[green]Metrics data successfully written to %s[/green]", file_path)
+            logger.info(f"[green]Metrics data successfully written to {file_path}[/green]")
         except Exception as e:
-            logger.error("[red]Error writing metrics data to %s:[/red] %s", file_path, e)
+            logger.error(f"[red]Error writing metrics data to {file_path}:[/red] {e}")

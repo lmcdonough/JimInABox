@@ -1,22 +1,29 @@
-# Logging request decorator
-
 import time
 from functools import wraps
+import logging
 
-# Import necessary modules
-from flask import request
+from rich.logging import RichHandler
 
+# Configure logging with RichHandler for informative logs
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    datefmt="[%X]",
+    handlers=[RichHandler(rich_tracebacks=True)],
+)
+# Initialize the logger for the server
+logger = logging.getLogger("metrics_logger")
 
+# Decorator to log the execution time of a function
 def log_request(func):
     """
     A decorator to log details about server request handling functions,
-    including endpoint, HTTP mehtod, execution time, and result.
+    including endpoint, HTTP method, execution time, and result.
     """
     @wraps(func)  # Ensure the wrapped function retains its original metadata
     def wrapper(*args, **kwargs):
         """
-        The wrapper function logs details before and after the wrapped function is executed
-        Specifically tailored for server reques handlers.
+        The wrapper function logs details before AND after the wrapped function is executed
         """
         # Extract additional context for server logging
         # Assumes the first arg is the request obj in the server context
@@ -25,8 +32,8 @@ def log_request(func):
         http_method = request.method if request and hasattr(request, 'method') else "Unknown Method"
 
         # Log request start
-        print(f"[LOG] Incoming request to endpoint `{endpoint}` using `{http_method}` method.")
-        print(f"    Rquest Arguments: {args}, Keyword Arguments: {kwargs}")
+        logger.info(f"[LOG] Incoming request to endpoint `{endpoint}` using `{http_method}` method.")
+        logger.info(f"    Rquest Arguments: {args}, Keyword Arguments: {kwargs}")
 
         # Record the start time
         start_time = time.time()
@@ -39,9 +46,9 @@ def log_request(func):
         duration = end_time - start_time
 
         # Log request completion
-        print(f"[LOG] reuest to `{endpoint}` completed")
-        print(f"    Response: {result}")
-        print(f"    Execution time: {duration:.4f} seconds")
+        logger.info(f"[LOG] reuest to `{endpoint}` completed")
+        logger.info(f"    Response: {result}")
+        logger.info(f"    Execution time: {duration:.4f} seconds")
 
         # Return the result of the wrapped function
         return result
