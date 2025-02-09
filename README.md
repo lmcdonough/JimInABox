@@ -135,7 +135,7 @@ poetry run pytest
 
 ---
 
-## **Development Workflow 🧑‍💻**
+## **Phase 1 Development Plan 🧑‍💻**
 
 1. Implement a Flask-based server (`MetricsServer`) with a modular design.
 2. Store mocked metrics in a JSON file for easy data management.
