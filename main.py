@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 
 from flask import Flask, request
 from markupsafe import escape
+from rich.console import Console
+from rich.table import Table
 
 from metrics_server.serializer import MetricsSerializer
 from metrics_server.logger import logger
@@ -28,7 +30,6 @@ def get_metric(metric_name):
         metric_value = route_manager.get_metric_value(metric_name)
         if metric_value:
             logger.info(f'Metric {metric_name} found')
-
             # Serialize the metric data into a dictionary
             data = {
                 "metric": escape(metric_name),
@@ -78,9 +79,28 @@ def add_metric():
             500,
         )
 
-if __name__ == "__main__":
-    # create an run the metrics server
-    # create an instance of the metrics server and pass in the Flask app instance
+def main():
+    # Create and run the metrics server
     server = MetricsServer(app=app)
     server.setup_routes()
+
+    # Create a Rich table to display loaded metrics and their endpoints
+    console = Console()
+    table = Table(title="Loaded Metrics and Endpoints", show_lines=True)
+    table.add_column("Metric", style="cyan", no_wrap=True)
+    table.add_column("URL", style="magenta")
+
+    # Retrieve the routes from the route manager
+    routes = route_manager.get_routes()
+    for metric, url in routes.items():
+        table.add_row(metric, url)
+
+    # Log additional useful info
+    console.print(table)
+    console.print(f"[bold green]Server Info:[/bold green] Running on http://localhost:5005")
+    console.print(f"[bold green]Timestamp:[/bold green] {datetime.now(timezone.utc).isoformat(timespec='seconds')}")
+
     server.run()
+
+if __name__ == "__main__":
+    main()

@@ -23,27 +23,27 @@ class MetricsServer:
         for metric, uri in routes.items():
             # create a handler instance for the metric
             handler = MetricHandler(metric, self)
-            # Map the route to the handler's handle_request method, with logging
-            self.app.route(uri, methods=["GET"])(log_request(handler.handle_request))
+            # Provide a unique endpoint name based on the metric
+            endpoint_name = f"handle_{metric}_request"
+            # Map the route to the handler's handle_request method, with logging,
+            # and supply the unique endpoint to avoid overwriting.
+            self.app.route(uri, methods=["GET"], endpoint=endpoint_name)(log_request(handler.handle_request))
 
     def get_metric_data(self, metric_name):
         """
-        Fetch data for a given metric from the JSON fixtures
-        :param metric_name: Name of the metric to fetch data for
-        :return: The value of the metric if available, otherwise an error message
+        Fetch data for a given metric from the JSON fixtures.
+        :param metric_name: Name of the metric to fetch data for.
+        :return: The value of the metric if available, otherwise an error message.
         """
-        console.log(f"Fetching data for metric: [bold blue]{metric_name}[/bold blue]")
+        console.log(f"Fetching data for metric: [blue]{metric_name}[/blue]")
         data = self.route_manager.get_metric_value(metric_name)
         if data == "Metric not found":
-            console.log(f"[bold red]Error:[/bold red] Metric '{metric_name}' not found in data.")
+            console.log(f"[red]Error: Metric '{metric_name}' not found in data.[/red]")
         return data
 
-    # method to start the Flask server
     def run(self, host="0.0.0.0", port=5005, debug=True):
         """
         Runs the Flask server with the default args that specify the host, port, and mode.
         """
-        # Log server startup details
         console.log(f"[green]Starting MetricsServer on {host}:{port}[/green]")
-        # start the Flask app with the passed in args
         self.app.run(host=host, port=port, debug=debug)

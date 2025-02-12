@@ -33,7 +33,7 @@ def log_request(func):
 
         # Log request start
         logger.info(f"[LOG] Incoming request to endpoint `{endpoint}` using `{http_method}` method.")
-        logger.info(f"    Rquest Arguments: {args}, Keyword Arguments: {kwargs}")
+        logger.info(f"    Request Arguments: {args}, Keyword Arguments: {kwargs}")
 
         # Record the start time
         start_time = time.time()
@@ -46,7 +46,7 @@ def log_request(func):
         duration = end_time - start_time
 
         # Log request completion
-        logger.info(f"[LOG] reuest to `{endpoint}` completed")
+        logger.info(f"[LOG] request to `{endpoint}` completed")
         logger.info(f"    Response: {result}")
         logger.info(f"    Execution time: {duration:.4f} seconds")
 

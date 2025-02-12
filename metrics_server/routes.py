@@ -15,18 +15,26 @@ class Route:
         """
         try:
             with open("metrics_server/config/routes.json", "r") as f:
-                self.routes = json.load(f)
-            logger.info("[green]Successfully loaded routes configuration.[/green]")
+                loaded_routes = json.load(f)
+
+            # Log routes if self.routes is empty (first load)
+            if not self.routes:
+                logger.info("Loaded routes config for metrics:\n%s", "\n".join(loaded_routes.keys()))
+            self.routes = loaded_routes
         except Exception as e:
-            logger.error(f"[red]Failed to load routes configuration:[/red] {e}")
+            logger.error(f"Failed to load routes configuration: {e}")
             self.routes = {}
 
         try:
             with open("metrics_server/config/metric_data.json", "r") as f:
-                self.metric_data = json.load(f)
-            logger.info("[green]Successfully loaded metric data.[/green]")
+                loaded_metric_data = json.load(f)
+
+            # Log metric data if self.metric_data is empty (first load)
+            if not self.metric_data:
+                logger.info("Loaded metric data for metrics:\n%s", "\n".join(list(loaded_metric_data.keys())))
+            self.metric_data = loaded_metric_data
         except Exception as e:
-            logger.error(f"[red]Failed to load metric data:[/red] {e}")
+            logger.error(f"Failed to load metric data: {e}")
             self.metric_data = {}
 
     def get_route(self, metric_name):
