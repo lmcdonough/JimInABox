@@ -44,7 +44,7 @@ cd devops-metrics-viewer
 Install Poetry (if not already installed):
 
 ```bash
-pip install poetry
+pip install poetry  # pip3 if using Homebrew on Mac
 ```
 
 Install project dependencies:
@@ -77,7 +77,7 @@ Mocked metrics data are stored in a JSON file to allow easy data management. Thi
 Start the Flask server:
 
 ```bash
-poetry run python main.py
+poetry run jim-in-box
 ```
 
 By default, the API server will be available at:  

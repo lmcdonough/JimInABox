@@ -1,7 +1,6 @@
 import json
 
 # Import the logger
-from metrics_server.routes import Route
 from metrics_server.logger import logger
 
 # Handler class for handling metric requests dynamically
@@ -14,8 +13,6 @@ class MetricHandler:
         """
         self.metric_name = metric_name
         self.server = server
-        self.route_manager = Route()
-        self.metric_data = self.route_manager.get_metric_data()
 
     def handle_request(self):
         """
@@ -27,7 +24,7 @@ class MetricHandler:
             # Log the beginning of request handling
             logger.info(f"Processing request for metric: {self.metric_name}")
             # Fetch data from the preloaded JSON fixture
-            data = self.route_manager.get_metric_value(self.metric_name)
+            data = self.server.route_manager.get_metric_value(self.metric_name)
             if data is None:
                 # Log a warning if the metric is not found
                 logger.warning(f"Metric '{self.metric_name}' not found.")
