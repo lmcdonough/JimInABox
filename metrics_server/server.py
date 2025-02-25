@@ -11,16 +11,16 @@ class MetricsServer:
         self.route_manager = route_manager
 
     def setup_routes(self):
-        """Dynamically map routes to their corresponding handlers."""
-        # Get routes from the route manager
+        # Dynamically map routes to their corresponding handlers
+        # Routes and URIs are defined in the ROUTES dictionary
         routes = self.route_manager.get_routes()
         for metric, uri in routes.items():
-            # Create a handler instance for the metric
+            # create a handler instance for the metric
             handler = MetricHandler(metric, self)
             # Provide a unique endpoint name based on the metric
             endpoint_name = f"handle_{metric}_request"
             # Map the route to the handler's handle_request method, with logging
-            # and supply the unique endpoint to avoid overwriting.
+            # then supply the unique endpoint to avoid overwriting.
             self.app.add_url_rule(uri, endpoint_name, log_request(handler.handle_request), methods=["GET"])
 
     def get_metric_data(self, metric_name):

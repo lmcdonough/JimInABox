@@ -106,6 +106,8 @@ class Route:
         Get all routes in the config file.
         :return: A dictionary of all routes.
         """
+        if not self.routes:
+            self._load_data()
         return self.routes
 
     def get_metric_data(self):
@@ -113,6 +115,9 @@ class Route:
         Get all metric data.
         :return: A dictionary of all metric data.
         """
+        # Load data if not already loaded
+        if not self.metric_data:
+            self._load_data()
         return self.metric_data
 
     def get_metric_value(self, metric_name):
