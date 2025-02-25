@@ -1,37 +1,44 @@
-"""
-- Encapsulates the business logic for fetching metrics
-- Demonstrates how to use classes to manage data and logic
-"""
-
 import json
-import os
-from rich.console import Console
 
-# console instance for logging
-console = Console()
+# Import the logger
+from metrics_server.logger import logger
 
-# business logic for handling metrics
-class MetricsHandler(self):
-	def __init__(self):
-		# load the mock data on initialization
-		self.data = self.load_mock_data()
+# Handler class for handling metric requests dynamically
+class MetricHandler:
+    def __init__(self, metric_name, server):
+        """
+        Initialize the handler with the metric name and the server instance.
+        :param metric_name: Name of the metric being handled (e.g. 'deployment-frequency')
+        :param server: Reference to the MetricsServer instance
+        """
+        self.metric_name = metric_name
+        self.server = server
 
-	@staticmethod
-	def load_mock_data():
-		# load JSON data from the metrics.json file
-		data_file = os.path.join(os.path.dirname(__file__), 'data', 'metrics.json')
-		with open(data_file, 'r') as file:
-			# log when data is successfully loaded
-			console.log(f"[blue]Loaded mock data from {data_file}[/blue]")
-			return json.load(file)
-
-	def get_metric(self, endpoint):
-		# Fetch metric data for the given endpoint
-		response = self.data.get(endpoint)
-		if response:
-			# log success
-			console.log(f"[green]Metric found for endpoint: {endpoint}[/green]")
-			return ({"status": "OK", "data": response})
-		# Log failure if not data is found
-		console.log(f"[red]Nod metric found for endopint: {endpoint}[/red]")
-		return {"status": "ERROR", "message": "Endpoint not found"}
+    def handle_request(self):
+        """
+        Handles the HTTP request for the metric.
+        Logs the process and returns the metric data.
+        :return: dict with status and metric data/error message.
+        """
+        try:
+            # Log the beginning of request handling
+            logger.info(f"Processing request for metric: {self.metric_name}")
+            # Fetch data from the preloaded JSON fixture
+            data = self.server.route_manager.get_metric_value(self.metric_name)
+            if data is None:
+                # Log a warning if the metric is not found
+                logger.warning(f"Metric '{self.metric_name}' not found.")
+                return {
+                    "status": "Error",
+                    "data": {"metric_name": self.metric_name, "value": "Metric not found"},
+                }
+            # Log success in retrieval
+            logger.info(f"Successfully retrieved metric '{self.metric_name}' with value: {data}")
+            return {"status": "OK", "data": {"metric_name": self.metric_name, "value": data}}
+        except Exception as e:
+            # Log any unexpected errors during request handling
+            logger.error(f"Error processing metric '{self.metric_name}': {e}")
+            return {
+                "status": "Error",
+                "data": {"metric_name": self.metric_name, "value": "Internal error"},
+            }

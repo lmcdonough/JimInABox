@@ -1,49 +1,41 @@
-"""
-- Defines the Flask app and routes
-- Logs requests using a custom decorator
-- Keeps routes minimal by delegating logic to handlers.py
-"""
+# import configuration and handlers
+from metrics_server.handlers import MetricHandler
+from metrics_server.logger import log_request, logger
 
-from flask import Flask, jsonify, request
-from metrics_server.handlers import MetricsHandler
-from rich.console import Console
 
-# Initialize a consolse instance for rich logging
-console = Console()
-
-# a decorator to log API requests
-def log_request(func):
-	def wrapper(*args, **kwargs):  # REVIEW CREATING DECORATORS WITH A WRAPPER FUNCTION
-		# Log the incoming request path and arguments
-		console.log(f"[cyan]Incoming requesto to {request.path} with args {request.args}[/cyan]")
-		return func(*args, **kwargs)
-	return wrapper
-
-# Class based Flask server setup
+# metrics server class
 class MetricsServer:
-	def __init__(self):
-		# create the flask app
-		self.app = Flask(__name__)
-		# initialize the metrics handler (business logic)
-		self.handler = MetricsHandler()
-		# setup routes
-		self.setup_routes()
+    def __init__(self, app, route_manager):
+        # Initialize the MetricsServer with the passed in Flask app instance
+        self.app = app
+        self.route_manager = route_manager
 
-	def setup_routes(self):
-		# define a single route for fetching metrics
-		@self.app.route('/metrics', method=['GET'])
-		@log_request  # apply the logging decorator
-		def metrics():
-			# get the "endpoint" parameter from the request
-			endpoint = request.args.get('endpoint')
-			if not endpoint:
-				# return an error and the http response code if the endpoint is missing
-				return jsonify({"status": "ERROR", "message": "Missing endpoint"}), 400
-			# delegate metric fetching to the handler
-			response = self.handler.get_metric(endpoint)
-			return jsonify(response)
+    def setup_routes(self):
+        # Dynamically map routes to their corresponding handlers
+        # Routes and URIs are defined in the ROUTES dictionary
+        routes = self.route_manager.get_routes()
+        for metric, uri in routes.items():
+            # create a handler instance for the metric
+            handler = MetricHandler(metric, self)
+            # Provide a unique endpoint name based on the metric
+            endpoint_name = f"handle_{metric}_request"
+            # Map the route to the handler's handle_request method, with logging
+            # then supply the unique endpoint to avoid overwriting.
+            self.app.add_url_rule(uri, endpoint_name, log_request(handler.handle_request), methods=["GET"])
 
-	def run(self, host="0.0.0.0", port=5000, debug=True):
-		# log server startup
-		console.log(f"[green]Starting MetricsServer on {host}:{port}[/green]")
-		self.app.run(host=host, port=port, debug=debug)
+    def get_metric_data(self, metric_name):
+        """
+        Fetch data for a given metric from the JSON fixtures.
+        :param metric_name: Name of the metric to fetch data for.
+        :return: The value of the metric if available, otherwise an error message.
+        """
+        data = self.route_manager.get_metric_value(metric_name)
+        if data == "Metric not found":
+            logger.error(f"Error: Metric '{metric_name}' not found in data.")
+        return data
+
+    def run(self, host="0.0.0.0", port=5005, debug=True):
+        """
+        Runs the Flask server with the default args that specify the host, port, and mode.
+        """
+        self.app.run(host=host, port=port, debug=debug)
