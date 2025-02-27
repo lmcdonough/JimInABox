@@ -5,9 +5,35 @@ from flask import Flask, request
 from markupsafe import escape
 from metrics_server.serializer import MetricsSerializer
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+from rich.console import Console
+from rich.logging import RichHandler
+from rich.theme import Theme
+
+# Define a custom theme for Rich logging
+custom_theme = Theme({
+    "logging.level.success": "green on black",
+    "logging.level.debug": "blue on black",
+    "logging.level.info": "green on black",
+    "logging.level.warning": "yellow",  # Added a new color
+    "logging.level.error": "bold white on red",
+    "logging.level.critical": "bold magenta on black"
+})
+
+# Initialize Rich console for colorful logging
+console = Console(theme=custom_theme)
+
+# Configure the RichHandler with the console
+handler = RichHandler(console=console, show_time=True, show_path=True)
+
+# Configure logging with RichHandler for informative logs
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    datefmt="[%X]",
+    handlers=[RichHandler(rich_tracebacks=True, show_time=True, show_path=True)],
+)
+
+logger = logging.getLogger("metrics_handler")
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -40,10 +66,10 @@ def get_metric(metric_name):
                 ),  # consistent iso timestamp format
             }
             return MetricsSerializer.serialize_response("OK", data)
-        logger.warning('Metric %s not found', metric_name)
+        logger.info('Metric %s not found', metric_name)
         return MetricsSerializer.serialize_response("ERROR", {"error": "Metric not found"}), 404
     except Exception as e:
-        logger.error('Unexpected error fetching metric %s: %s', metric_name, str(e))
+        logger.info('Unexpected error fetching metric %s: %s', metric_name, str(e))
         return (
             MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
             500,
@@ -69,7 +95,7 @@ def add_metric():
 
         return MetricsSerializer.serialize_response("OK", {"message": "Metric added successfully"})
     except Exception as e:
-        logger.error('Unexpected error adding metric: %s', e)
+        logger.info('Unexpected error adding metric: %s', e)
         return (
             MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
             500,

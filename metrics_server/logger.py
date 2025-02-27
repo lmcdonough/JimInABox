@@ -1,4 +1,9 @@
 # Logging request decorator
+import logging
+from rich.console import Console
+from rich.logging import RichHandler
+from rich.theme import Theme
+
 
 import time
 from functools import wraps
@@ -6,7 +11,29 @@ from functools import wraps
 # Import necessary modules
 from flask import request
 
+# Rich Logging Class
+class RichLogger:
+    """
+    A custom logger class that uses Rich for colorful logging.
+    """
 
+    def __init__(self, name, level=logging.INFO, custom_theme=None):
+        """
+        Initialize the logger with the specified level and optional custom theme.
+        """
+        self.logger = logging.getLogger(name)
+        self.logger.setLevel(level)
+
+        # Define logging theme
+            # Customize the theme
+        custom_theme = Theme({
+            "debug": "blue on black",
+            "info": "green on black",
+            "warning": "orange3",  # Added a new color
+            "error": "bold white on red",
+            "critical": "bold magenta on black",
+            "special": "bold white on blue" # Added custom styling
+        })
 def log_request(func):
     """
     A decorator to log details about server request handling functions,

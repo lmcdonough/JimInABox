@@ -4,15 +4,35 @@ import logging
 from flask import jsonify
 from rich.logging import RichHandler
 
+from rich.console import Console
+from rich.logging import RichHandler
+from rich.theme import Theme
 
-# Configure logger to use RichHandler for colorful, informative logging
+# Define a custom theme for Rich logging
+custom_theme = Theme({
+    "logging.level.success": "green on black",
+    "logging.level.debug": "blue on black",
+    "logging.level.info": "green on black",
+    "logging.level.warning": "yellow",  # Added a new color
+    "logging.level.error": "bold white on red",
+    "logging.level.critical": "bold magenta on black"
+})
+
+# Initialize Rich console for colorful logging
+console = Console(theme=custom_theme)
+
+# Configure the RichHandler with the console
+handler = RichHandler(console=console, show_time=True, show_path=True)
+
+# Configure logging with RichHandler for informative logs
 logging.basicConfig(
     level=logging.INFO,
     format="%(message)s",
     datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)],
+    handlers=[RichHandler(rich_tracebacks=True, show_time=True, show_path=True)],
 )
-logger = logging.getLogger("metrics_logger")
+
+logger = logging.getLogger("metrics_handler")
 
 class MetricsSerializer:
     # Serialize response into JSON format, using rich logging for errors
@@ -27,7 +47,7 @@ class MetricsSerializer:
             return jsonify(response)
         except Exception as e:
             # log error and return 500 because serialization failed
-            logger.error("[red]Error serializing response:[/red] %s", e)
+            logger.info("Error serializing response: %s", e)
             return jsonify({"status": "ERROR", "data": {"error": "Internal server error"}}), 500
 
     # Deserialize request data from JSON format, logging with rich coloring
@@ -36,7 +56,7 @@ class MetricsSerializer:
         try:
             return json.loads(request_data)
         except json.JSONDecodeError as e:
-            logger.error("[red]Error deserializing request:[/red] %s", e)
+            logger.info("Error deserializing request: %s", e)
             return None
 
     # Read metrics data from JSON file with rich logging on error
@@ -45,10 +65,10 @@ class MetricsSerializer:
         try:
             with open(file_path, 'r') as file:
                 data = json.load(file)
-                logger.info("[green]Successfully loaded metrics data from %s[/green]", file_path)
+                logger.info("Successfully loaded metrics data from %s", file_path)
                 return data
         except Exception as e:
-            logger.error("[red]Error reading metrics data from %s:[/red] %s", file_path, e)
+            logger.info("Error reading metrics data from %s: %s", file_path, e)
             return {}
 
     # Write metrics data to JSON file with informative rich logs
@@ -57,6 +77,6 @@ class MetricsSerializer:
         try:
             with open(file_path, 'w') as file:
                 json.dump(data, file, indent=4)
-            logger.info("[green]Metrics data successfully written to %s[/green]", file_path)
+            logger.info("Metrics data successfully written to %s", file_path)
         except Exception as e:
-            logger.error("[red]Error writing metrics data to %s:[/red] %s", file_path, e)
+            logger.info("[Error writing metrics data to %s: %s", file_path, e)

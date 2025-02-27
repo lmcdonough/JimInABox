@@ -8,35 +8,50 @@ import logging
 
 from rich.console import Console
 from rich.logging import RichHandler
+from rich.theme import Theme
+
+# Define a custom theme for Rich logging
+custom_theme = Theme({
+    "logging.level.success": "green on black",
+    "logging.level.debug": "blue on black",
+    "logging.level.info": "green on black",
+    "logging.level.warning": "yellow",  # Added a new color
+    "logging.level.error": "bold white on red",
+    "logging.level.critical": "bold magenta on black"
+})
 
 # Initialize Rich console for colorful logging
-console = Console()
+console = Console(theme=custom_theme)
+
+# Configure the RichHandler with the console
+handler = RichHandler(console=console, show_time=True, show_path=True)
 
 # Configure logging with RichHandler for informative logs
 logging.basicConfig(
     level=logging.INFO,
     format="%(message)s",
     datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)],
+    handlers=[RichHandler(rich_tracebacks=True)]
 )
+
 logger = logging.getLogger("metrics_handler")
 
 # Load metric data from JSON file with error handling
 try:
     with open("metrics_server/config/metric_data.json", "r") as f:
         METRIC_DATA = json.load(f)
-    console.log("[green]Successfully loaded metric data.[/green]")
+    logger.info("Successfully loaded metric data.")
 except Exception as e:
-    logger.error("[red]Failed to load metric data:[/red] %s", e)
+    logger.info("Failed to load metric data: %s", e)
     METRIC_DATA = {}
 
 # Load the routes from the configuration file
 try:
     with open("metrics_server/config/routes.json", "r") as f:
         ROUTES = json.load(f)
-    console.log("[green]Successfully loaded routes configuration.[/green]")
+    logger.info("Successfully loaded routes configuration.")
 except Exception as e:
-    logger.error("[red]Failed to load routes configuration:[/red] %s", e)
+    logger.info("Failed to load routes configuration: %s", e)
     ROUTES = {}
 
 # Handler class for handling metric requests dynamically
@@ -58,26 +73,26 @@ class MetricHandler:
         """
         try:
             # Log the beginning of request handling
-            console.log(
-                f"[bold blue]Processing request for metric:[/bold blue] [bold green]{self.metric_name}[/bold green]"
+            logger.info(
+                f"Processing request for metric: {self.metric_name}"
             )
             # Fetch data from the preloaded JSON fixture
             data = METRIC_DATA.get(self.metric_name)
             if data is None:
                 # Log a warning if the metric is not found
-                console.log(f"[yellow]Metric '{self.metric_name}' not found.[/yellow]")
+                logger.error(f"Metric '{self.metric_name}' not found.")
                 return {
                     "status": "Error",
                     "data": {"metric_name": self.metric_name, "value": "Metric not found"},
                 }
             # Log success in retrieval
-            console.log(
-                f"[green]Successfully retrieved metric '{self.metric_name}' with value: {data}[/green]"
+            logger.info(
+                f"Successfully retrieved metric '{self.metric_name}' with value: {data}"
             )
             return {"status": "OK", "data": {"metric_name": self.metric_name, "value": data}}
         except Exception as e:
             # Log any unexpected errors during request handling
-            logger.error("[red]Error processing metric '%s':[/red] %s", self.metric_name, e)
+            logger.info("Error processing metric '%s': %s", self.metric_name, e)
             return {
                 "status": "Error",
                 "data": {"metric_name": self.metric_name, "value": "Internal error"},
