@@ -25,8 +25,7 @@ A modular Python project that simulates an HTTP server for retrieving and displa
 * **Python:** Core programming language.
 * **Flask:** For building the HTTP server.
 * **Rich:** For color-coded logging and enhanced developer experience.
-* **Poetry:** For dependency management and environment setup.
-* **Unit Testing:** Using `unittest` and `pytest` for robust test coverage.
+* **Poetry:** For dependency management, running the development server, and managing environment setup.
 
 ---
 
@@ -44,10 +43,10 @@ cd devops-metrics-viewer
 Install Poetry (if not already installed):
 
 ```bash
-pip install poetry
+pip install poetry # pip3 if using MacOS
 ```
 
-Install project dependencies:
+Create the Poetry Environment and Install project dependencies:
 
 ```bash
 poetry install
@@ -55,14 +54,23 @@ poetry install
 
 ### 3. **Activate the Poetry Environment**
 
-Use the updated Poetry command to activate the virtual environment:
+Use the following shell command to activate the newly created Poetry virtual environment:
 
 ```bash
-poetry env use python
+source <(poetry env info -p)/bin/activate
 poetry env info
 ```
 
-(Tip: Run `poetry env list` to get the correct path.)
+Other useful Poetry commands:
+
+```bash
+poetry env list            # List all virtual environments
+poetry show                # Show installed dependencies
+poetry env info            # Show information about the current environment
+poetry add <package_name>  # Add a new package to your project
+poetry update               # Update dependencies
+poetry run <command>        # Run a command inside the virtual environment
+```
 
 ---
 
@@ -77,11 +85,11 @@ Mocked metrics data are stored in a JSON file to allow easy data management. Thi
 Start the Flask server:
 
 ```bash
-poetry run python main.py
+poetry run jim-in-a-box
 ```
 
-By default, the server will run on:  
-**`http://localhost:5005`**
+By default, the  `Flask` `development` server will run on:  
+**`http://127.0.0.1:5005`**
 
 ---
 
@@ -99,16 +107,6 @@ Retrieve metrics via these endpoints:
 | Change Failure Rate        | `GET /metrics/change-failure-rate`        |
 | Cycle Time                 | `GET /metrics/cycle-time`                 |
 
-### **Additional Metrics**
-
-| Metric                  | Endpoint                                  |
-|-------------------------|-------------------------------------------|
-| Automation Percentage   | `GET /metrics/automation-percentage`      |
-| Test Coverage          | `GET /metrics/test-coverage`             |
-| System Uptime          | `GET /metrics/system-uptime`             |
-| Customer Feedback      | `GET /metrics/customer-feedback`         |
-| Team Collaboration     | `GET /metrics/team-collaboration`        |
-
 Example Request:
 
 ```bash
@@ -125,16 +123,6 @@ curl "http://127.0.0.1:5005/metrics/deployment-frequency"
 
 ---
 
-## **Testing 🧪**
-
-Run unit tests using `pytest`:
-
-```bash
-poetry run pytest
-```
-
----
-
 ## **Development Workflow 🧑‍💻**
 
 1. Implement a Flask-based server (`MetricsServer`) with a modular design.
@@ -147,6 +135,7 @@ poetry run pytest
 
 ## **Future Enhancements 🛠️**
 
+* Add tests for API endpoints.
 * Extend functionality to include real-time CI/CD metrics via API integration.
 * Add timestamped metrics and trend visualization (Phase 3).
 * Implement more advanced text-based or graphical visualization libraries (e.g., `matplotlib`).

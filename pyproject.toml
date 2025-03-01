@@ -27,3 +27,5 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 jim-in-a-box = "main:main"
+test = "tests.test:test"
+tests = "pytest:main"
