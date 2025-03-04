@@ -66,10 +66,10 @@ def get_metric(metric_name):
                 ),  # consistent iso timestamp format
             }
             return MetricsSerializer.serialize_response("OK", data)
-        logger.info('Metric %s not found', metric_name)
+        logger.warning('Metric %s not found', metric_name)
         return MetricsSerializer.serialize_response("ERROR", {"error": "Metric not found"}), 404
     except Exception as e:
-        logger.info('Unexpected error fetching metric %s: %s', metric_name, str(e))
+        logger.error('Unexpected error fetching metric %s: %s', metric_name, str(e))
         return (
             MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
             500,
@@ -95,7 +95,7 @@ def add_metric():
 
         return MetricsSerializer.serialize_response("OK", {"message": "Metric added successfully"})
     except Exception as e:
-        logger.info('Unexpected error adding metric: %s', e)
+        logger.error('Unexpected error adding metric: %s', e)
         return (
             MetricsSerializer.serialize_response("ERROR", {"error": "Internal server error"}),
             500,

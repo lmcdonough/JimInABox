@@ -47,7 +47,7 @@ class MetricsSerializer:
             return jsonify(response)
         except Exception as e:
             # log error and return 500 because serialization failed
-            logger.info("Error serializing response: %s", e)
+            logger.error("Error serializing response: %s", e)
             return jsonify({"status": "ERROR", "data": {"error": "Internal server error"}}), 500
 
     # Deserialize request data from JSON format, logging with rich coloring
@@ -56,7 +56,7 @@ class MetricsSerializer:
         try:
             return json.loads(request_data)
         except json.JSONDecodeError as e:
-            logger.info("Error deserializing request: %s", e)
+            logger.error("Error deserializing request: %s", e)
             return None
 
     # Read metrics data from JSON file with rich logging on error
@@ -68,7 +68,7 @@ class MetricsSerializer:
                 logger.info("Successfully loaded metrics data from %s", file_path)
                 return data
         except Exception as e:
-            logger.info("Error reading metrics data from %s: %s", file_path, e)
+            logger.error("Error reading metrics data from %s: %s", file_path, e)
             return {}
 
     # Write metrics data to JSON file with informative rich logs
@@ -79,4 +79,4 @@ class MetricsSerializer:
                 json.dump(data, file, indent=4)
             logger.info("Metrics data successfully written to %s", file_path)
         except Exception as e:
-            logger.info("[Error writing metrics data to %s: %s", file_path, e)
+            logger.error("[Error writing metrics data to %s: %s", file_path, e)
