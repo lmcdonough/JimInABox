@@ -4,37 +4,8 @@
 """
 
 import json
-import logging
 
-from rich.console import Console
-from rich.logging import RichHandler
-from rich.theme import Theme
-
-# Define a custom theme for Rich logging
-custom_theme = Theme({
-    "logging.level.success": "green on black",
-    "logging.level.debug": "blue on black",
-    "logging.level.info": "green on black",
-    "logging.level.warning": "yellow",  # Added a new color
-    "logging.level.error": "bold white on red",
-    "logging.level.critical": "bold magenta on black"
-})
-
-# Initialize Rich console for colorful logging
-console = Console(theme=custom_theme)
-
-# Configure the RichHandler with the console
-handler = RichHandler(console=console, show_time=True, show_path=True)
-
-# Configure logging with RichHandler for informative logs
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)]
-)
-
-logger = logging.getLogger("metrics_handler")
+from metrics_server.logger import logger
 
 # Load metric data from JSON file with error handling
 try:
@@ -42,7 +13,7 @@ try:
         METRIC_DATA = json.load(f)
     logger.info("Successfully loaded metric data.")
 except Exception as e:
-    logger.info("Failed to load metric data: %s", e)
+    logger.error("Failed to load metric data: %s", e)
     METRIC_DATA = {}
 
 # Load the routes from the configuration file
@@ -51,7 +22,7 @@ try:
         ROUTES = json.load(f)
     logger.info("Successfully loaded routes configuration.")
 except Exception as e:
-    logger.info("Failed to load routes configuration: %s", e)
+    logger.error("Failed to load routes configuration: %s", e)
     ROUTES = {}
 
 # Handler class for handling metric requests dynamically
@@ -92,7 +63,7 @@ class MetricHandler:
             return {"status": "OK", "data": {"metric_name": self.metric_name, "value": data}}
         except Exception as e:
             # Log any unexpected errors during request handling
-            logger.info("Error processing metric '%s': %s", self.metric_name, e)
+            logger.error("Error processing metric '%s': %s", self.metric_name, e)
             return {
                 "status": "Error",
                 "data": {"metric_name": self.metric_name, "value": "Internal error"},
