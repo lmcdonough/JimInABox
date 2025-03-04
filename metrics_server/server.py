@@ -3,43 +3,11 @@
 - Logs requests using a custom decorator
 - Keeps routes minimal by delegating logic to handlers.py
 """
-import logging
 
 # import metrics config
 from metrics_server.handlers import METRIC_DATA, MetricHandler, ROUTES
+from metrics_server.logger import log_request, logger
 
-from metrics_server.logger import log_request
-
-from rich.console import Console
-from rich.logging import RichHandler
-from rich.theme import Theme
-
-
-# Define a custom theme for Rich logging
-custom_theme = Theme({
-    "logging.level.success": "green on black",
-    "logging.level.debug": "blue on black",
-    "logging.level.info": "green on black",
-    "logging.level.warning": "yellow",  # Added a new color
-    "logging.level.error": "bold white on red",
-    "logging.level.critical": "bold magenta on black"
-})
-
-# Initialize Rich console for colorful logging
-console = Console(theme=custom_theme)
-
-# Configure the RichHandler with the console
-handler = RichHandler(console=console, show_time=True, show_path=True)
-
-# Configure logging with RichHandler for informative logs
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)]
-)
-
-logger = logging.getLogger("metrics_handler")
 
 # metrics server class
 class MetricsServer:
@@ -66,7 +34,7 @@ class MetricsServer:
         logger.info(f"Fetching data for metric: {metric_name}")
         data = METRIC_DATA.get(metric_name, "Metric not found")
         if data == "Metric not found":
-            logger.info(f"Error: Metric '{metric_name}' not found in data.")
+            logger.error(f"Error: Metric '{metric_name}' not found in data.")
         return data
 
     # method to start the Flask server
@@ -75,6 +43,6 @@ class MetricsServer:
         Runs the Flask server with the default args that specify the host, port, and mode.
         """
         # Log server startup details
-        logger.info(f"Starting MetricsServer on {host}:{port}")
+        # logger.info(f"Starting MetricsServer on {host}:{port}")
         # start the Flask app with the passed in args
         self.app.run(host=host, port=port, debug=debug)
