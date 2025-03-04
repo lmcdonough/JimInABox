@@ -1,38 +1,7 @@
 import json
-import logging
 
 from flask import jsonify
-from rich.logging import RichHandler
-
-from rich.console import Console
-from rich.logging import RichHandler
-from rich.theme import Theme
-
-# Define a custom theme for Rich logging
-custom_theme = Theme({
-    "logging.level.success": "green on black",
-    "logging.level.debug": "blue on black",
-    "logging.level.info": "green on black",
-    "logging.level.warning": "yellow",  # Added a new color
-    "logging.level.error": "bold white on red",
-    "logging.level.critical": "bold magenta on black"
-})
-
-# Initialize Rich console for colorful logging
-console = Console(theme=custom_theme)
-
-# Configure the RichHandler with the console
-handler = RichHandler(console=console, show_time=True, show_path=True)
-
-# Configure logging with RichHandler for informative logs
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True, show_time=True, show_path=True)],
-)
-
-logger = logging.getLogger("metrics_handler")
+from metrics_server.logger import logger
 
 class MetricsSerializer:
     # Serialize response into JSON format, using rich logging for errors
