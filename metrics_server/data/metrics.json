@@ -1,4 +1,0 @@
-{
-    "http://acme.com/ms/deployment-frequency": {"value": 10},
-    "http://acme.com/ms/change-lead-time": {"value": "2 hours"}
-}

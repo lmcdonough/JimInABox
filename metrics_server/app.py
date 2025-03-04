@@ -1,19 +1,17 @@
-import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import Flask, request
 from markupsafe import escape
-from metrics_server.serializer import MetricsSerializer
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+from metrics_server.serializer import MetricsSerializer
+from metrics_server.logger import logger  
+
 
 # Initialize Flask app
 app = Flask(__name__)
 
 # Path to the metrics data file
-METRICS_DATA_FILE = 'metrics_server/data/metrics_data.json'
+METRICS_DATA_FILE = 'metrics_server/config/metric_data.json'
 
 # Load metrics data from a separate JSON file
 metrics_data = MetricsSerializer.read_metrics_data(METRICS_DATA_FILE)
@@ -27,10 +25,17 @@ def get_metric(metric_name):
 
         # Check if metric exists and return it
         if metric_name in metrics_data:
+            logger.info('Metric %s found', metric_name)
+
+            # Serialize the metric data into a dictionary
             data = {
                 "metric": escape(metric_name),
-                "value": escape(metrics_data[metric_name]),
-                "timestamp": datetime.now(datetime.timezone.utc).isoformat(),
+                "value": str(
+                    escape(metrics_data[metric_name])
+                ),  # ensure value is string safe for json
+                "timestamp": datetime.now(timezone.utc).isoformat(
+                    timespec='milliseconds'
+                ),  # consistent iso timestamp format
             }
             return MetricsSerializer.serialize_response("OK", data)
         logger.warning('Metric %s not found', metric_name)
@@ -70,4 +75,4 @@ def add_metric():
 
 # Run the Flask app in debug mode
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

@@ -11,6 +11,9 @@ packages = [{ include = "metrics_server" }]
 python = ">=3.10"
 flask = "^3.1.0"
 rich = "^13.9.4"
+python-dotenv = "^1.0.1"
+ipython = "^8.31.0"
+ipdb = "^0.13.13"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.0"
@@ -21,3 +24,8 @@ poetry-plugin-export = ">=1.8"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+jim-in-a-box = "main:main"
+test = "tests.test:test"
+tests = "pytest:main"

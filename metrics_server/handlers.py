@@ -4,34 +4,89 @@
 """
 
 import json
-import os
-from rich.console import Console
 
-# console instance for logging
-console = Console()
+from metrics_server.logger import logger
 
-# business logic for handling metrics
-class MetricsHandler(self):
-	def __init__(self):
-		# load the mock data on initialization
-		self.data = self.load_mock_data()
+# Load metric data from JSON file with error handling
+try:
+    with open("metrics_server/config/metric_data.json", "r") as f:
+        METRIC_DATA = json.load(f)
+    logger.info("Successfully loaded metric data.")
+except Exception as e:
+    logger.error("Failed to load metric data: %s", e)
+    METRIC_DATA = {}
 
-	@staticmethod
-	def load_mock_data():
-		# load JSON data from the metrics.json file
-		data_file = os.path.join(os.path.dirname(__file__), 'data', 'metrics.json')
-		with open(data_file, 'r') as file:
-			# log when data is successfully loaded
-			console.log(f"[blue]Loaded mock data from {data_file}[/blue]")
-			return json.load(file)
+# Load the routes from the configuration file
+try:
+    with open("metrics_server/config/routes.json", "r") as f:
+        ROUTES = json.load(f)
+    logger.info("Successfully loaded routes configuration.")
+except Exception as e:
+    logger.error("Failed to load routes configuration: %s", e)
+    ROUTES = {}
 
-	def get_metric(self, endpoint):
-		# Fetch metric data for the given endpoint
-		response = self.data.get(endpoint)
-		if response:
-			# log success
-			console.log(f"[green]Metric found for endpoint: {endpoint}[/green]")
-			return ({"status": "OK", "data": response})
-		# Log failure if not data is found
-		console.log(f"[red]Nod metric found for endopint: {endpoint}[/red]")
-		return {"status": "ERROR", "message": "Endpoint not found"}
+# Handler class for handling metric requests dynamically
+class MetricHandler:
+    def __init__(self, metric_name, server):
+        """
+        Initialize the handler with the metric name and the server instance.
+        :param metric_name: Name of the metric being handled (e.g. 'deployment-frequency')
+        :param server: Reference to the MetricsServer instance
+        """
+        self.metric_name = metric_name
+        self.server = server
+
+    def handle_request(self):
+        """
+        Handles the HTTP request for the metric.
+        Logs the process using rich colored messages and returns the metric data.
+        :return: dict with status and metric data/error message.
+        """
+        try:
+            # Log the beginning of request handling
+            logger.info(
+                f"Processing request for metric: {self.metric_name}"
+            )
+            # Fetch data from the preloaded JSON fixture
+            data = METRIC_DATA.get(self.metric_name)
+            if data is None:
+                # Log a warning if the metric is not found
+                logger.error(f"Metric '{self.metric_name}' not found.")
+                return {
+                    "status": "Error",
+                    "data": {"metric_name": self.metric_name, "value": "Metric not found"},
+                }
+            # Log success in retrieval
+            logger.info(
+                f"Successfully retrieved metric '{self.metric_name}' with value: {data}"
+            )
+            return {"status": "OK", "data": {"metric_name": self.metric_name, "value": data}}
+        except Exception as e:
+            # Log any unexpected errors during request handling
+            logger.error("Error processing metric '%s': %s", self.metric_name, e)
+            return {
+                "status": "Error",
+                "data": {"metric_name": self.metric_name, "value": "Internal error"},
+            }
+
+# Routes class for managing routes and their corresponding handlers
+class Routes:
+    def __init__(self):
+        self.routes = {}
+        # Load routes from the config file
+        with open("config/routes.json", "r") as f:
+            self.routes = json.load(f)
+
+    def get_route(self, metric_name):
+        """
+        Get the route for a given metric name
+        :param metric_name: Name of the metric
+        :return: The route for the metric, or None if not found
+        """
+        return self.routes.get(metric_name)
+
+    def get_routes(self):
+        """Get all routes in the config file
+        :return: A dictionary of all routes
+        """
+        return self.routes
